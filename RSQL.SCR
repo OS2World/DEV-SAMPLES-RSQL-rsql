@@ -1,0 +1,470 @@
+EXEC DBA: CONTINUE_ON_ERROR;
+EXEC DBA: STARTUSE SAMPLE S;
+
+--  *------------------------------------------------------------------*
+--  * SCRIPT  1:  A simple SQL Query Demonstration                     *
+--  *------------------------------------------------------------------*
+
+--  ****** Display all rows and columns from the ORG table        ******
+EXEC SQL: SELECT * FROM ORG
+          ORDER BY DIVISION, LOCATION;
+
+--  ****** Display all rows and columns from the STAFF table      ******
+EXEC SQL: SELECT * FROM STAFF
+          ORDER BY NAME;
+
+--  *------------------------------------------------------------------*
+--  * SCRIPT  2:  A demonstration of the WHERE search clause           *
+--  *------------------------------------------------------------------*
+
+--  ****** A simple relational predicate with no duplicate rows   ******
+EXEC SQL: SELECT DISTINCT *
+          FROM ORG
+          WHERE DIVISION = 'EASTERN';
+
+--  ****** Using OR to connect relational predicates              ******
+EXEC SQL: SELECT *
+          FROM STAFF
+          WHERE (JOB = 'SALES' AND YEARS > 8)
+             OR (JOB = 'SALES' AND COMM >= 1200);
+
+--  ****** Wild card pattern-matching using the LIKE predicate    ******
+EXEC SQL: SELECT ID, NAME
+          FROM STAFF
+          WHERE NAME LIKE 'LU%';
+
+--  ****** The BETWEEN predicate for comparing ranges of values   ******
+EXEC SQL: SELECT ID, NAME, SALARY
+          FROM STAFF
+          WHERE SALARY BETWEEN 20000 AND 21000;
+
+--  ****** The IN predicate for testing group membership          ******
+EXEC SQL: SELECT ID, NAME, DEPT
+          FROM STAFF
+          WHERE DEPT IN (66, 84);
+
+--  ****** The NULL predicate for testing NULL values             ******
+EXEC SQL: SELECT ID, NAME, DEPT
+          FROM STAFF
+          WHERE YEARS IS NULL;
+
+--  *------------------------------------------------------------------*
+--  * SCRIPT  3:  A demonstration of the ORDER by clause               *
+--  *------------------------------------------------------------------*
+
+--  ****** The default sorting order is ascending (ASC)           ******
+EXEC SQL: SELECT DEPT, NAME, ID
+          FROM STAFF
+          WHERE (DEPT = 10 OR DEPT = 20)
+          ORDER BY DEPT, NAME;
+
+--  ****** You can override the default by specifying (DESC)      ******
+EXEC SQL: SELECT *
+          FROM ORG
+          ORDER BY DIVISION DESC, DEPTNUMB DESC;
+
+
+--  *------------------------------------------------------------------*
+--  * SCRIPT  4:  A demonstration of simple NESTED Queries             *
+--  *------------------------------------------------------------------*
+
+--  ****** The inner SELECT returns a single value                ******
+EXEC SQL: SELECT NAME, JOB, YEARS, SALARY, COMM
+          FROM STAFF
+          WHERE JOB = 'Sales'
+          AND SALARY > (
+          SELECT AVG(SALARY) FROM STAFF WHERE JOB = 'Mgr');
+
+--  ****** The inner SELECT returns multiple values               ******
+EXEC SQL: SELECT NAME, JOB, YEARS, SALARY, COMM
+          FROM STAFF
+          WHERE JOB = 'Sales'
+          AND YEARS > ALL (
+          SELECT YEARS FROM STAFF WHERE JOB = 'Mgr');
+
+--  ****** Different tables involved in inner and outer queries   ******
+EXEC SQL: SELECT NAME, JOB, YEARS, SALARY, COMM
+          FROM STAFF
+          WHERE JOB = 'Sales'
+          AND DEPT IN (
+          SELECT DEPTNUMB FROM ORG WHERE DIVISION = 'Eastern')
+          ORDER BY YEARS;
+
+--  *------------------------------------------------------------------*
+--  * SCRIPT  5:  A demonstration of compount NESTED queries           *
+--  *------------------------------------------------------------------*
+
+--  ****** Two subqueries at the same level                       ******
+EXEC SQL: SELECT NAME, JOB, YEARS, SALARY, COMM
+          FROM STAFF
+          WHERE JOB = 'Sales'
+          AND (salary + comm) >
+              (SELECT MIN(salary) FROM staff where job='Mgr')
+          AND dept IN
+              (SELECT deptnumb from org WHERE division='Eastern')
+          ORDER BY job, salary;
+
+--  ****** A subquery inside another subquery                     ******
+EXEC SQL: SELECT NAME, JOB, YEARS, SALARY, COMM
+          FROM STAFF
+          WHERE JOB = 'Sales'
+          AND years > ALL
+              (SELECT years FROM staff where job='Mgr'
+               AND dept IN
+                   (SELECT deptnumb FROM org WHERE division='Eastern'))
+          ORDER BY years;
+
+--  *------------------------------------------------------------------*
+--  * SCRIPT  6:  A demonstration of CORRELATED subqueries             *
+--  *------------------------------------------------------------------*
+
+--  ****** Inner query runs once for each job category            ******
+EXEC SQL: SELECT NAME, JOB, YEARS, SALARY, COMM
+          FROM STAFF S
+          WHERE SALARY =
+              (SELECT MAX(SALARY) FROM STAFF WHERE JOB = S.JOB)
+          ORDER BY JOB, SALARY;
+
+--  *------------------------------------------------------------------*
+--  * SCRIPT  7:  A demonstration of set operators                     *
+--  *------------------------------------------------------------------*
+
+--  ****** Merging two queries with the INTESECT set operator     ******
+EXEC SQL: SELECT NAME, JOB
+          FROM STAFF
+          WHERE JOB = 'Sales'
+          INTERSECT
+          SELECT NAME, JOB
+          FROM STAFF
+          WHERE YEARS > 10;
+
+--  ****** Merging two queries with the EXCEPT set operator       ******
+EXEC SQL: SELECT NAME, JOB
+          FROM STAFF
+          WHERE JOB = 'Sales'
+          EXCEPT
+          SELECT NAME, JOB
+          FROM STAFF
+          WHERE YEARS > 10
+          ORDER BY 1;
+
+--  ****** Merging two queries with the UNION set operator        ******
+EXEC SQL: SELECT NAME, JOB
+          FROM STAFF
+          WHERE JOB = 'Sales'
+          UNION
+          SELECT NAME, JOB
+          FROM STAFF
+          WHERE YEARS > 10
+          ORDER BY 1;
+
+--  *------------------------------------------------------------------*
+--  * SCRIPT  8:  A demonstration of JOINS                             *
+--  *------------------------------------------------------------------*
+
+--  ****** Two-table equijoin using fully qualified names         ******
+EXEC SQL: SELECT ORG.DEPTNAME, ORG.LOCATION, STAFF.NAME, STAFF.SALARY
+          FROM STAFF, ORG
+          WHERE ORG.MANAGER = STAFF.ID
+          ORDER BY ORG.DEPTNAME;
+
+--  ****** Two-table equijoin using correlation names             ******
+EXEC SQL: SELECT O.DEPTNAME, O.LOCATION, S.NAME, S.SALARY
+          FROM STAFF S, ORG O
+          WHERE O.MANAGER = S.ID
+          ORDER BY O.DEPTNAME;
+
+--  *------------------------------------------------------------------*
+--  * SCRIPT  9:  Creating Tables, Inserts, Updates and Deletes        *
+--  *------------------------------------------------------------------*
+
+--  ****** Create the staff table's twin                          ******
+EXEC SQL: CREATE TABLE NEWSTAFF
+                       (ID        SMALLINT NOT NULL,
+                        NAME      VARCHAR(9),
+                        DEPT      SMALLINT,
+                        JOB       CHAR(5),
+                        YEARS     SMALLINT,
+                        SALARY    DECIMAL(7,2),
+                        COMM      DECIMAL(7,2));
+
+--  ****** Insert two rows into the NEWSTAFF table                ******
+EXEC SQL: INSERT INTO NEWSTAFF
+          VALUES (500, 'Bob', 99, 'Nerds', 5, 45000.00, 0);
+EXEC SQL: INSERT INTO NEWSTAFF
+          VALUES (501, 'Dan', 99, 'Nerds', 4, 42000.00, 0);
+
+--  ****** Use a subquery to insert rows from STAFF               ******
+EXEC SQL: INSERT INTO NEWSTAFF
+                 SELECT * FROM STAFF
+                 WHERE  JOB = 'Sales' AND SALARY > 18000;
+
+--  ****** COMMIT the work done so far                            ******
+EXEC SQL: COMMIT;
+
+--  ****** Let's see what we've got                               ******
+EXEC SQL: SELECT * FROM NEWSTAFF
+          ORDER BY SALARY DESC;
+
+--  ****** Let's give ourselves a good raise                      ******
+EXEC SQL: UPDATE NEWSTAFF
+          SET SALARY = SALARY * 1.80
+          WHERE JOB = 'Nerds';
+
+--  ****** Things look better now                                 ******
+EXEC SQL: SELECT * FROM NEWSTAFF
+          WHERE SALARY + COMM > 21000
+          ORDER BY SALARY DESC;
+
+--  ****** Here's how DELETE works                                ******
+EXEC SQL: DELETE FROM NEWSTAFF
+          WHERE JOB = 'Sales';
+
+--  ****** Let's see what happened                                ******
+EXEC SQL: SELECT * FROM NEWSTAFF
+          ORDER BY SALARY DESC;
+
+--  *------------------------------------------------------------------*
+--  * SCRIPT 10:  A demonstration of COMMIT/ROLLBACK                   *
+--  *------------------------------------------------------------------*
+
+--  ****** Start a unit of recovery                               ******
+EXEC SQL: COMMIT;
+
+--  ****** Let's see what we've got to start                      ******
+EXEC SQL: SELECT * FROM NEWSTAFF;
+
+--  ****** Delete all the rows                                    ******
+EXEC SQL: DELETE FROM NEWSTAFF;
+
+--  ****** Show the empty table                                   ******
+EXEC SQL: SELECT * FROM NEWSTAFF;
+
+--  ****** Undo the transaction                                   ******
+EXEC SQL: ROLLBACK;
+
+--  ****** Show the resurrected rows                              ******
+EXEC SQL: SELECT * FROM NEWSTAFF;
+
+--  *------------------------------------------------------------------*
+--  * SCRIPT 11:  Data integrity with NO NULLS                         *
+--  *------------------------------------------------------------------*
+
+--  ****** Here's a way to insert missing values in regular cols  ******
+EXEC SQL: INSERT INTO NEWSTAFF (ID, NAME, DEPT, JOB)
+          VALUES (506, 'Ray', 99, 'Nerds');
+
+--  ****** Here's another way                                     ******
+EXEC SQL: INSERT INTO NEWSTAFF
+          VALUES (507, 'Dan', 99, 'Nerds', NULL, NULL, NULL);
+
+--  ****** Let's see what we've got                               ******
+EXEC SQL: SELECT * FROM NEWSTAFF;
+
+--  ****** Watch what happens when inserting into a NOT NULL col  ******
+EXEC SQL: INSERT INTO NEWSTAFF
+          VALUES (NULL, 'Joe', 99, 'Nerds', 1, 30000.00, 0.0);
+
+--  ****** Let's get rid of the garbage data                      ******
+EXEC SQL: ROLLBACK;
+
+--  *------------------------------------------------------------------*
+--  * SCRIPT 12:  Data integrity with UNIQUE keys                      *
+--  *------------------------------------------------------------------*
+
+--  ****** Let's try inserting a duplicate record into NEWSTAFF   ******
+EXEC SQL: INSERT INTO NEWSTAFF
+          VALUES (501, 'Dan', 99, 'Nerds', 4, 75600.00, 0);
+
+--  ****** As you can see we're not protected against duplicates  ******
+EXEC SQL: SELECT * FROM NEWSTAFF;
+
+--  ****** Let's get rid of this entry                            ******
+EXEC SQL: ROLLBACK;
+
+--  ****** Let's protect ourselves, add a UNIQUE index on ID      ******
+EXEC SQL: CREATE UNIQUE INDEX XID ON NEWSTAFF (ID)
+
+--  ****** Let's see if ENTITY INTEGRITY really works             ******
+EXEC SQL: INSERT INTO NEWSTAFF
+          VALUES (501, 'Dan', 99, 'Nerds', 4, 42000.00, 0);
+
+--  ****** COMMIT the work done so far                            ******
+EXEC SQL: COMMIT;
+
+--  *------------------------------------------------------------------*
+--  * SCRIPT 13:  Data integrity using views with CHECK option         *
+--  *------------------------------------------------------------------*
+
+--  ****** Create a view PROTECT_STAFF with CHECK option          ******
+EXEC SQL: CREATE VIEW PROTECT_STAFF
+          AS SELECT * FROM NEWSTAFF
+          WHERE JOB = 'Nerds' OR JOB = 'Sales'
+          WITH CHECK OPTION;
+
+--  ****** Let's see what's in this view so far                   ******
+EXEC SQL: SELECT * FROM PROTECT_STAFF;
+
+--  ****** Let's put some more data in PROTECT_STAFF              ******
+EXEC SQL: INSERT INTO PROTECT_STAFF
+          SELECT * FROM STAFF
+          WHERE JOB = 'Sales' and SALARY > 20000;
+
+--  ****** Now let's insert another well-paid nerd                ******
+EXEC SQL: INSERT INTO PROTECT_STAFF
+          VALUES (508, 'Joe', 99, 'Nerds', 4, 99000.00, 0.0);
+
+--  ****** Watch what happens when we try to insert a Mgr         ******
+EXEC SQL: INSERT INTO PROTECT_STAFF
+          VALUES (603, 'Sam', 99, 'Mgr', 4, 89000.00, 0.0);
+
+--  ****** COMMIT the work done so far                            ******
+EXEC SQL: COMMIT;
+
+--  *------------------------------------------------------------------*
+--  * SCRIPT 14:  Enforcing Data Integrity with Referential Integrity  *
+--  *------------------------------------------------------------------*
+
+--  ****** Create the ORG table's cousin                          ******
+EXEC SQL: CREATE TABLE NEWORG
+          (DEPTNUMB SMALLINT NOT NULL PRIMARY KEY,
+           DEPTNAME VARCHAR(14),
+           MANAGER  SMALLINT,
+           DIVISION VARCHAR(10),
+           LOCATION VARCHAR(13));
+
+--  ****** Let's put some data into it                            ******
+EXEC SQL: INSERT INTO NEWORG
+          VALUES (99, 'Software', NULL, 'Oceanview', 'Hawaii');
+EXEC SQL: INSERT INTO NEWORG
+          VALUES (90, 'Multimedia', NULL, 'Oceanview', 'Tahiti');
+
+--  ****** Let's start with only Nerds in the NEWSTAFF table      ******
+EXEC SQL: DELETE FROM NEWSTAFF
+          WHERE JOB <> 'Nerds';
+
+--  ****** Let's see what we've got so far                        ******
+EXEC SQL: SELECT * FROM NEWORG;
+EXEC SQL: SELECT * FROM NEWSTAFF;
+
+--  ****** Make DEPT a foreign key to primary key in NEWORG       ******
+EXEC SQL: ALTER TABLE NEWSTAFF
+          FOREIGN KEY KEYNAME1(DEPT) REFERENCES NEWORG
+          ON DELETE RESTRICT;
+
+--  ****** Insert data for a valid dept                           ******
+EXEC SQL: INSERT INTO NEWSTAFF
+          VALUES (605, 'Newhire', 99, 'Nerds', 0, 29000.00, 0.0);
+EXEC SQL: INSERT INTO NEWSTAFF
+          VALUES (607, 'Newhire', 90, 'Nerds', 0, 29000.00, 0.0);
+
+--  ****** Watch what happens when inserting with an invalid dept ******
+EXEC SQL: INSERT INTO NEWSTAFF
+          VALUES (609, 'Newhire', 20, 'Nerds', 0, 29000.00, 0.0);
+
+--  ****** COMMIT the work done so far                            ******
+EXEC SQL: COMMIT;
+
+--  *------------------------------------------------------------------*
+--  * SCRIPT 15:  Enforcing Delete Rules with Referential Integrity    *
+--  *------------------------------------------------------------------*
+
+--  ****** Observe how the default DELETE rule protects dependents******
+EXEC SQL: DELETE FROM NEWORG
+          WHERE LOCATION = 'Tahiti';
+
+--  ****** COMMIT the work done so far                            ******
+EXEC SQL: COMMIT;
+
+--  ****** Let's see what data is in our tables                   ******
+EXEC SQL: SELECT * FROM NEWORG;
+EXEC SQL: SELECT * FROM NEWSTAFF;
+
+--  ****** DROP the referential constraint                        ******
+EXEC SQL: ALTER TABLE NEWSTAFF
+          DROP FOREIGN KEY KEYNAME1;
+
+--  ****** Let's change the referential constraint to SET NULLS   ******
+EXEC SQL: ALTER TABLE NEWSTAFF
+          FOREIGN KEY KEYNAME1(DEPT) REFERENCES NEWORG
+          ON DELETE SET NULL;
+
+--  ****** COMMIT the change                                      ******
+EXEC SQL: COMMIT;
+
+--  ****** Let's see what REFERENTIAL INTEGRITY does for us now   ******
+EXEC SQL: DELETE FROM NEWORG
+          WHERE LOCATION = 'Tahiti';
+
+--  ****** The Tahiti dept is dropped (this is the parent row)    ******
+EXEC SQL: SELECT * FROM NEWORG;
+
+--  ****** The Tahiti dept in child rows is set to NULL           ******
+EXEC SQL: SELECT * FROM NEWSTAFF;
+
+--  ****** Let's get back our data                                ******
+EXEC SQL: ROLLBACK;
+
+--  ****** DROP the referential constraint                        ******
+EXEC SQL: ALTER TABLE NEWSTAFF
+          DROP FOREIGN KEY KEYNAME1;
+
+--  ****** Let's change the referential constraint to CASCADE     ******
+EXEC SQL: ALTER TABLE NEWSTAFF
+          FOREIGN KEY KEYNAME1(DEPT) REFERENCES NEWORG
+          ON DELETE CASCADE;
+
+--  ****** COMMIT the change                                      ******
+EXEC SQL: COMMIT;
+
+--  ****** Let's see what REFERENTIAL INTEGRITY does for us now   ******
+EXEC SQL: DELETE FROM NEWORG
+          WHERE LOCATION = 'Hawaii';
+
+--  ****** The parent dept for Hawaii is gone                     ******
+EXEC SQL: SELECT * FROM NEWORG;
+
+--  ****** All the Hawaii employees (the child rows) are also gone******
+EXEC SQL: SELECT * FROM NEWSTAFF;
+
+--  ****** Let's get back our data, we made the point             ******
+EXEC SQL: ROLLBACK;
+
+--  *------------------------------------------------------------------*
+--  * SCRIPT 16:  Cascaded Delete rules with Referential Integrity     *
+--  *------------------------------------------------------------------*
+
+--  ****** Specify the PRIMARY key for NEWSTAFF                   ******
+EXEC SQL: ALTER TABLE NEWSTAFF PRIMARY KEY (ID);
+
+--  ****** Create the SPOUSES table                               ******
+EXEC SQL: CREATE TABLE SPOUSES
+          (SPOUSE_NAME VARCHAR(20),
+           TELEPHONE   VARCHAR(10),
+           EMPL_ID     SMALLINT,
+           FOREIGN KEY HOMENUM(EMPL_ID) REFERENCES NEWSTAFF
+           ON DELETE CASCADE);
+
+--  ****** Insert some data into spouses                          ******
+EXEC SQL: INSERT INTO SPOUSES
+          VALUES ('Michiko', '4152223333', 501);
+EXEC SQL: INSERT INTO SPOUSES
+          VALUES ('Jeri', '4154445555', 500);
+
+--  ****** Let's take stock of what we've got                     ******
+EXEC SQL: SELECT * FROM NEWORG;
+EXEC SQL: SELECT * FROM NEWSTAFF;
+EXEC SQL: SELECT * FROM SPOUSES;
+
+--  ****** Watch this cruel & unusual punishment: No more Hawaii  ******
+EXEC SQL: DELETE FROM NEWORG
+          WHERE  LOCATION = 'Hawaii';
+
+--  ****** Let's see the the damage this has created              ******
+EXEC SQL: SELECT * FROM NEWORG;
+EXEC SQL: SELECT * FROM NEWSTAFF;
+EXEC SQL: SELECT * FROM SPOUSES;
+
+--  ****** Let's bring back our data, we made the point           ******
+EXEC SQL: ROLLBACK;
+

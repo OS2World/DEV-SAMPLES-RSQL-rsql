@@ -1,0 +1,9 @@
+.\RSQL.obj: \
+    H:\IBMWF\PRJ\RSQL\RSQL.c \
+    {H:\IBMWF\PRJ\RSQL;$(INCLUDE);}rsql.h \
+    RSQL.MAK
+.\RSQL.c: \
+    H:\IBMWF\PRJ\RSQL\RSQL.sqc \
+    RSQL.MAK
+
+

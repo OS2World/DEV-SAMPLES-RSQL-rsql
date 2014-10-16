@@ -1,0 +1,1211 @@
+EXEC DBA: CONTINUE_ON_ERROR
+
+
+EXEC DBA: STARTUSE SAMPLE S
+
+ OK. sql_rcd = 0         Execution time =     5.2800 secs
+
+
+--  *------------------------------------------------------------------*
+--  * SCRIPT  1:  A simple SQL Query Demonstration                     *
+--  *------------------------------------------------------------------*
+
+--  ****** Display all rows and columns from the ORG table        ******
+EXEC SQL: SELECT * FROM ORG
+          ORDER BY DIVISION, LOCATION
+
+ DEPTNUMB  DEPTNAME        MANAGER  DIVISION    LOCATION                                                                                                                                                                    
+ --------  --------------  -------  ----------  -------------                                                                                                                                                               
+ 10        Head Office     160      Corporate   New York                                                                                                                                                                    
+ 38        South Atlantic  30       Eastern     Atlanta                                                                                                                                                                     
+ 15        New England     50       Eastern     Boston                                                                                                                                                                      
+ 20        Mid Atlantic    10       Eastern     Washington                                                                                                                                                                  
+ 42        Great Lakes     100      Midwest     Chicago                                                                                                                                                                     
+ 51        Plains          140      Midwest     Dallas                                                                                                                                                                      
+ 84        Mountain        290      Western     Denver                                                                                                                                                                      
+ 66        Pacific         270      Western     San Francisco                                                                                                                                                               
+
+ Total Number of Rows SELECTED = 8
+
+ OK. sql_rcd = 0         Execution time =     4.1500 secs
+
+
+--  ****** Display all rows and columns from the STAFF table      ******
+EXEC SQL: SELECT * FROM STAFF
+          ORDER BY NAME
+
+ ID      NAME       DEPT    JOB    YEARS   SALARY    COMM                                                                                                                                                                   
+ ------  ---------  ------  -----  ------  --------  --------                                                                                                                                                               
+ 180     Abrahams   38      Clerk  3       12009.75    236.50                                                                                                                                                               
+ 330     Burke      66      Clerk  1       10988.00     55.50                                                                                                                                                               
+ 240     Daniels    10      Mgr    5       19260.25  NULL                                                                                                                                                                   
+ 300     Davis      84      Sales  5       15454.50    806.10                                                                                                                                                               
+ 340     Edwards    84      Sales  7       17844.00   1285.00                                                                                                                                                               
+ 140     Fraye      51      Mgr    6       21150.00  NULL                                                                                                                                                                   
+ 350     Gafney     84      Clerk  5       13030.50    188.00                                                                                                                                                               
+ 320     Gonzales   66      Sales  4       16858.20    844.00                                                                                                                                                               
+ 310     Graham     66      Sales  13      21000.00    200.30                                                                                                                                                               
+ 50      Hanes      15      Mgr    10      20659.80  NULL                                                                                                                                                                   
+ 80      James      20      Clerk  NULL    13504.60    128.20                                                                                                                                                               
+ 260     Jones      10      Mgr    12      21234.00  NULL                                                                                                                                                                   
+ 170     Kermisch   15      Clerk  4       12258.50    110.10                                                                                                                                                               
+ 90      Koonitz    42      Sales  6       18001.75   1386.70                                                                                                                                                               
+ 270     Lea        66      Mgr    9       18555.50  NULL                                                                                                                                                                   
+ 210     Lu         10      Mgr    10      20010.00  NULL                                                                                                                                                                   
+ 230     Lundquist  51      Clerk  3       13369.80    189.65                                                                                                                                                               
+ 30      Marenghi   38      Mgr    5       17506.75  NULL                                                                                                                                                                   
+ 160     Molinare   10      Mgr    7       22959.20  NULL                                                                                                                                                                   
+ 120     Naughton   38      Clerk  NULL    12954.75    180.00                                                                                                                                                               
+ 110     Ngan       15      Clerk  5       12508.20    206.60                                                                                                                                                               
+ 40      O'Brien    38      Sales  6       18006.00    846.55                                                                                                                                                               
+ 20      Pernal     20      Sales  8       18171.25    612.45                                                                                                                                                               
+ 100     Plotz      42      Mgr    7       18352.80  NULL                                                                                                                                                                   
+ 60      Quigley    38      Sales  NULL    16808.30    650.25                                                                                                                                                               
+ 290     Quill      84      Mgr    10      19818.00  NULL                                                                                                                                                                   
+ 70      Rothman    15      Sales  7       16502.83   1152.00                                                                                                                                                               
+ 10      Sanders    20      Mgr    7       18357.50  NULL                                                                                                                                                                   
+ 200     Scoutten   42      Clerk  NULL    11508.60     84.20                                                                                                                                                               
+ 220     Smith      51      Sales  7       17654.50    992.80                                                                                                                                                               
+ 190     Sneider    20      Clerk  8       14252.75    126.50                                                                                                                                                               
+ 250     Wheeler    51      Clerk  6       14460.00    513.30                                                                                                                                                               
+ 150     Williams   51      Sales  6       19456.50    637.65                                                                                                                                                               
+ 280     Wilson     66      Sales  9       18674.50    811.50                                                                                                                                                               
+ 130     Yamaguchi  42      Clerk  6       10505.90     75.60                                                                                                                                                               
+
+ Total Number of Rows SELECTED = 35
+
+ OK. sql_rcd = 0         Execution time =     0.3700 secs
+
+
+--  *------------------------------------------------------------------*
+--  * SCRIPT  2:  A demonstration of the WHERE search clause           *
+--  *------------------------------------------------------------------*
+
+--  ****** A simple relational predicate with no duplicate rows   ******
+EXEC SQL: SELECT DISTINCT *
+          FROM ORG
+          WHERE DIVISION = 'EASTERN'
+
+ DEPTNUMB  DEPTNAME        MANAGER  DIVISION    LOCATION                                                                                                                                                                    
+ --------  --------------  -------  ----------  -------------                                                                                                                                                               
+
+ Total Number of Rows SELECTED = 0
+
+ OK. sql_rcd = 0         Execution time =     0.4300 secs
+
+
+--  ****** Using OR to connect relational predicates              ******
+EXEC SQL: SELECT *
+          FROM STAFF
+          WHERE (JOB = 'SALES' AND YEARS > 8)
+             OR (JOB = 'SALES' AND COMM >= 1200)
+
+ ID      NAME       DEPT    JOB    YEARS   SALARY    COMM                                                                                                                                                                   
+ ------  ---------  ------  -----  ------  --------  --------                                                                                                                                                               
+
+ Total Number of Rows SELECTED = 0
+
+ OK. sql_rcd = 0         Execution time =     0.5100 secs
+
+
+--  ****** Wild card pattern-matching using the LIKE predicate    ******
+EXEC SQL: SELECT ID, NAME
+          FROM STAFF
+          WHERE NAME LIKE 'LU%'
+
+ ID      NAME                                                                                                                                                                                                               
+ ------  ---------                                                                                                                                                                                                          
+
+ Total Number of Rows SELECTED = 0
+
+ OK. sql_rcd = 0         Execution time =     0.0300 secs
+
+
+--  ****** The BETWEEN predicate for comparing ranges of values   ******
+EXEC SQL: SELECT ID, NAME, SALARY
+          FROM STAFF
+          WHERE SALARY BETWEEN 20000 AND 21000
+
+ ID      NAME       SALARY                                                                                                                                                                                                  
+ ------  ---------  --------                                                                                                                                                                                                
+ 50      Hanes      20659.80                                                                                                                                                                                                
+ 210     Lu         20010.00                                                                                                                                                                                                
+ 310     Graham     21000.00                                                                                                                                                                                                
+
+ Total Number of Rows SELECTED = 3
+
+ OK. sql_rcd = 0         Execution time =     0.0300 secs
+
+
+--  ****** The IN predicate for testing group membership          ******
+EXEC SQL: SELECT ID, NAME, DEPT
+          FROM STAFF
+          WHERE DEPT IN (66, 84)
+
+ ID      NAME       DEPT                                                                                                                                                                                                    
+ ------  ---------  ------                                                                                                                                                                                                  
+ 270     Lea        66                                                                                                                                                                                                      
+ 280     Wilson     66                                                                                                                                                                                                      
+ 290     Quill      84                                                                                                                                                                                                      
+ 300     Davis      84                                                                                                                                                                                                      
+ 310     Graham     66                                                                                                                                                                                                      
+ 320     Gonzales   66                                                                                                                                                                                                      
+ 330     Burke      66                                                                                                                                                                                                      
+ 340     Edwards    84                                                                                                                                                                                                      
+ 350     Gafney     84                                                                                                                                                                                                      
+
+ Total Number of Rows SELECTED = 9
+
+ OK. sql_rcd = 0         Execution time =     0.0300 secs
+
+
+--  ****** The NULL predicate for testing NULL values             ******
+EXEC SQL: SELECT ID, NAME, DEPT
+          FROM STAFF
+          WHERE YEARS IS NULL
+
+ ID      NAME       DEPT                                                                                                                                                                                                    
+ ------  ---------  ------                                                                                                                                                                                                  
+ 60      Quigley    38                                                                                                                                                                                                      
+ 80      James      20                                                                                                                                                                                                      
+ 120     Naughton   38                                                                                                                                                                                                      
+ 200     Scoutten   42                                                                                                                                                                                                      
+
+ Total Number of Rows SELECTED = 4
+
+ OK. sql_rcd = 0         Execution time =     0.0300 secs
+
+
+--  *------------------------------------------------------------------*
+--  * SCRIPT  3:  A demonstration of the ORDER by clause               *
+--  *------------------------------------------------------------------*
+
+--  ****** The default sorting order is ascending (ASC)           ******
+EXEC SQL: SELECT DEPT, NAME, ID
+          FROM STAFF
+          WHERE (DEPT = 10 OR DEPT = 20)
+          ORDER BY DEPT, NAME
+
+ DEPT    NAME       ID                                                                                                                                                                                                      
+ ------  ---------  ------                                                                                                                                                                                                  
+ 10      Daniels    240                                                                                                                                                                                                     
+ 10      Jones      260                                                                                                                                                                                                     
+ 10      Lu         210                                                                                                                                                                                                     
+ 10      Molinare   160                                                                                                                                                                                                     
+ 20      James      80                                                                                                                                                                                                      
+ 20      Pernal     20                                                                                                                                                                                                      
+ 20      Sanders    10                                                                                                                                                                                                      
+ 20      Sneider    190                                                                                                                                                                                                     
+
+ Total Number of Rows SELECTED = 8
+
+ OK. sql_rcd = 0         Execution time =     0.1400 secs
+
+
+--  ****** You can override the default by specifying (DESC)      ******
+EXEC SQL: SELECT *
+          FROM ORG
+          ORDER BY DIVISION DESC, DEPTNUMB DESC
+
+ DEPTNUMB  DEPTNAME        MANAGER  DIVISION    LOCATION                                                                                                                                                                    
+ --------  --------------  -------  ----------  -------------                                                                                                                                                               
+ 84        Mountain        290      Western     Denver                                                                                                                                                                      
+ 66        Pacific         270      Western     San Francisco                                                                                                                                                               
+ 51        Plains          140      Midwest     Dallas                                                                                                                                                                      
+ 42        Great Lakes     100      Midwest     Chicago                                                                                                                                                                     
+ 38        South Atlantic  30       Eastern     Atlanta                                                                                                                                                                     
+ 20        Mid Atlantic    10       Eastern     Washington                                                                                                                                                                  
+ 15        New England     50       Eastern     Boston                                                                                                                                                                      
+ 10        Head Office     160      Corporate   New York                                                                                                                                                                    
+
+ Total Number of Rows SELECTED = 8
+
+ OK. sql_rcd = 0         Execution time =     0.0900 secs
+
+
+--  *------------------------------------------------------------------*
+--  * SCRIPT  4:  A demonstration of simple NESTED Queries             *
+--  *------------------------------------------------------------------*
+
+--  ****** The inner SELECT returns a single value                ******
+EXEC SQL: SELECT NAME, JOB, YEARS, SALARY, COMM
+          FROM STAFF
+          WHERE JOB = 'Sales'
+          AND SALARY > (
+          SELECT AVG(SALARY) FROM STAFF WHERE JOB = 'Mgr')
+
+ NAME       JOB    YEARS   SALARY    COMM                                                                                                                                                                                   
+ ---------  -----  ------  --------  --------                                                                                                                                                                               
+ Graham     Sales  13      21000.00    200.30                                                                                                                                                                               
+
+ Total Number of Rows SELECTED = 1
+
+ OK. sql_rcd = 0         Execution time =     0.2200 secs
+
+
+--  ****** The inner SELECT returns multiple values               ******
+EXEC SQL: SELECT NAME, JOB, YEARS, SALARY, COMM
+          FROM STAFF
+          WHERE JOB = 'Sales'
+          AND YEARS > ALL (
+          SELECT YEARS FROM STAFF WHERE JOB = 'Mgr')
+
+ NAME       JOB    YEARS   SALARY    COMM                                                                                                                                                                                   
+ ---------  -----  ------  --------  --------                                                                                                                                                                               
+ Graham     Sales  13      21000.00    200.30                                                                                                                                                                               
+
+ Total Number of Rows SELECTED = 1
+
+ OK. sql_rcd = 0         Execution time =     0.0600 secs
+
+
+--  ****** Different tables involved in inner and outer queries   ******
+EXEC SQL: SELECT NAME, JOB, YEARS, SALARY, COMM
+          FROM STAFF
+          WHERE JOB = 'Sales'
+          AND DEPT IN (
+          SELECT DEPTNUMB FROM ORG WHERE DIVISION = 'Eastern')
+          ORDER BY YEARS
+
+ NAME       JOB    YEARS   SALARY    COMM                                                                                                                                                                                   
+ ---------  -----  ------  --------  --------                                                                                                                                                                               
+ O'Brien    Sales  6       18006.00    846.55                                                                                                                                                                               
+ Rothman    Sales  7       16502.83   1152.00                                                                                                                                                                               
+ Pernal     Sales  8       18171.25    612.45                                                                                                                                                                               
+ Quigley    Sales  NULL    16808.30    650.25                                                                                                                                                                               
+
+ Total Number of Rows SELECTED = 4
+
+ OK. sql_rcd = 0         Execution time =     0.9000 secs
+
+
+--  *------------------------------------------------------------------*
+--  * SCRIPT  5:  A demonstration of compount NESTED queries           *
+--  *------------------------------------------------------------------*
+
+--  ****** Two subqueries at the same level                       ******
+EXEC SQL: SELECT NAME, JOB, YEARS, SALARY, COMM
+          FROM STAFF
+          WHERE JOB = 'Sales'
+          AND (salary + comm) >
+              (SELECT MIN(salary) FROM staff where job='Mgr')
+          AND dept IN
+              (SELECT deptnumb from org WHERE division='Eastern')
+          ORDER BY job, salary
+
+ NAME       JOB    YEARS   SALARY    COMM                                                                                                                                                                                   
+ ---------  -----  ------  --------  --------                                                                                                                                                                               
+ Rothman    Sales  7       16502.83   1152.00                                                                                                                                                                               
+ O'Brien    Sales  6       18006.00    846.55                                                                                                                                                                               
+ Pernal     Sales  8       18171.25    612.45                                                                                                                                                                               
+
+ Total Number of Rows SELECTED = 3
+
+ OK. sql_rcd = 0         Execution time =     0.3700 secs
+
+
+--  ****** A subquery inside another subquery                     ******
+EXEC SQL: SELECT NAME, JOB, YEARS, SALARY, COMM
+          FROM STAFF
+          WHERE JOB = 'Sales'
+          AND years > ALL
+              (SELECT years FROM staff where job='Mgr'
+               AND dept IN
+                   (SELECT deptnumb FROM org WHERE division='Eastern'))
+          ORDER BY years
+
+ NAME       JOB    YEARS   SALARY    COMM                                                                                                                                                                                   
+ ---------  -----  ------  --------  --------                                                                                                                                                                               
+ Graham     Sales  13      21000.00    200.30                                                                                                                                                                               
+
+ Total Number of Rows SELECTED = 1
+
+ OK. sql_rcd = 0         Execution time =     0.1600 secs
+
+
+--  *------------------------------------------------------------------*
+--  * SCRIPT  6:  A demonstration of CORRELATED subqueries             *
+--  *------------------------------------------------------------------*
+
+--  ****** Inner query runs once for each job category            ******
+EXEC SQL: SELECT NAME, JOB, YEARS, SALARY, COMM
+          FROM STAFF S
+          WHERE SALARY =
+              (SELECT MAX(SALARY) FROM STAFF WHERE JOB = S.JOB)
+          ORDER BY JOB, SALARY
+
+ NAME       JOB    YEARS   SALARY    COMM                                                                                                                                                                                   
+ ---------  -----  ------  --------  --------                                                                                                                                                                               
+ Wheeler    Clerk  6       14460.00    513.30                                                                                                                                                                               
+ Molinare   Mgr    7       22959.20  NULL                                                                                                                                                                                   
+ Graham     Sales  13      21000.00    200.30                                                                                                                                                                               
+
+ Total Number of Rows SELECTED = 3
+
+ OK. sql_rcd = 0         Execution time =     0.4000 secs
+
+
+--  *------------------------------------------------------------------*
+--  * SCRIPT  7:  A demonstration of set operators                     *
+--  *------------------------------------------------------------------*
+
+--  ****** Merging two queries with the INTESECT set operator     ******
+EXEC SQL: SELECT NAME, JOB
+          FROM STAFF
+          WHERE JOB = 'Sales'
+          INTERSECT
+          SELECT NAME, JOB
+          FROM STAFF
+          WHERE YEARS > 10
+
+ 1          2                                                                                                                                                                                                               
+ ---------  -----                                                                                                                                                                                                           
+ Graham     Sales                                                                                                                                                                                                           
+
+ Total Number of Rows SELECTED = 1
+
+ OK. sql_rcd = 0         Execution time =     0.2200 secs
+
+
+--  ****** Merging two queries with the EXCEPT set operator       ******
+EXEC SQL: SELECT NAME, JOB
+          FROM STAFF
+          WHERE JOB = 'Sales'
+          EXCEPT
+          SELECT NAME, JOB
+          FROM STAFF
+          WHERE YEARS > 10
+          ORDER BY 1
+
+ 1          2                                                                                                                                                                                                               
+ ---------  -----                                                                                                                                                                                                           
+ Davis      Sales                                                                                                                                                                                                           
+ Edwards    Sales                                                                                                                                                                                                           
+ Gonzales   Sales                                                                                                                                                                                                           
+ Koonitz    Sales                                                                                                                                                                                                           
+ O'Brien    Sales                                                                                                                                                                                                           
+ Pernal     Sales                                                                                                                                                                                                           
+ Quigley    Sales                                                                                                                                                                                                           
+ Rothman    Sales                                                                                                                                                                                                           
+ Smith      Sales                                                                                                                                                                                                           
+ Williams   Sales                                                                                                                                                                                                           
+ Wilson     Sales                                                                                                                                                                                                           
+
+ Total Number of Rows SELECTED = 11
+
+ OK. sql_rcd = 0         Execution time =     0.1300 secs
+
+
+--  ****** Merging two queries with the UNION set operator        ******
+EXEC SQL: SELECT NAME, JOB
+          FROM STAFF
+          WHERE JOB = 'Sales'
+          UNION
+          SELECT NAME, JOB
+          FROM STAFF
+          WHERE YEARS > 10
+          ORDER BY 1
+
+ 1          2                                                                                                                                                                                                               
+ ---------  -----                                                                                                                                                                                                           
+ Davis      Sales                                                                                                                                                                                                           
+ Edwards    Sales                                                                                                                                                                                                           
+ Gonzales   Sales                                                                                                                                                                                                           
+ Graham     Sales                                                                                                                                                                                                           
+ Jones      Mgr                                                                                                                                                                                                             
+ Koonitz    Sales                                                                                                                                                                                                           
+ O'Brien    Sales                                                                                                                                                                                                           
+ Pernal     Sales                                                                                                                                                                                                           
+ Quigley    Sales                                                                                                                                                                                                           
+ Rothman    Sales                                                                                                                                                                                                           
+ Smith      Sales                                                                                                                                                                                                           
+ Williams   Sales                                                                                                                                                                                                           
+ Wilson     Sales                                                                                                                                                                                                           
+
+ Total Number of Rows SELECTED = 13
+
+ OK. sql_rcd = 0         Execution time =     0.1700 secs
+
+
+--  *------------------------------------------------------------------*
+--  * SCRIPT  8:  A demonstration of JOINS                             *
+--  *------------------------------------------------------------------*
+
+--  ****** Two-table equijoin using fully qualified names         ******
+EXEC SQL: SELECT ORG.DEPTNAME, ORG.LOCATION, STAFF.NAME, STAFF.SALARY
+          FROM STAFF, ORG
+          WHERE ORG.MANAGER = STAFF.ID
+          ORDER BY ORG.DEPTNAME
+
+ DEPTNAME        LOCATION       NAME       SALARY                                                                                                                                                                           
+ --------------  -------------  ---------  --------                                                                                                                                                                         
+ Great Lakes     Chicago        Plotz      18352.80                                                                                                                                                                         
+ Head Office     New York       Molinare   22959.20                                                                                                                                                                         
+ Mid Atlantic    Washington     Sanders    18357.50                                                                                                                                                                         
+ Mountain        Denver         Quill      19818.00                                                                                                                                                                         
+ New England     Boston         Hanes      20659.80                                                                                                                                                                         
+ Pacific         San Francisco  Lea        18555.50                                                                                                                                                                         
+ Plains          Dallas         Fraye      21150.00                                                                                                                                                                         
+ South Atlantic  Atlanta        Marenghi   17506.75                                                                                                                                                                         
+
+ Total Number of Rows SELECTED = 8
+
+ OK. sql_rcd = 0         Execution time =     0.1800 secs
+
+
+--  ****** Two-table equijoin using correlation names             ******
+EXEC SQL: SELECT O.DEPTNAME, O.LOCATION, S.NAME, S.SALARY
+          FROM STAFF S, ORG O
+          WHERE O.MANAGER = S.ID
+          ORDER BY O.DEPTNAME
+
+ DEPTNAME        LOCATION       NAME       SALARY                                                                                                                                                                           
+ --------------  -------------  ---------  --------                                                                                                                                                                         
+ Great Lakes     Chicago        Plotz      18352.80                                                                                                                                                                         
+ Head Office     New York       Molinare   22959.20                                                                                                                                                                         
+ Mid Atlantic    Washington     Sanders    18357.50                                                                                                                                                                         
+ Mountain        Denver         Quill      19818.00                                                                                                                                                                         
+ New England     Boston         Hanes      20659.80                                                                                                                                                                         
+ Pacific         San Francisco  Lea        18555.50                                                                                                                                                                         
+ Plains          Dallas         Fraye      21150.00                                                                                                                                                                         
+ South Atlantic  Atlanta        Marenghi   17506.75                                                                                                                                                                         
+
+ Total Number of Rows SELECTED = 8
+
+ OK. sql_rcd = 0         Execution time =     0.0900 secs
+
+
+--  *------------------------------------------------------------------*
+--  * SCRIPT  9:  Creating Tables, Inserts, Updates and Deletes        *
+--  *------------------------------------------------------------------*
+
+--  ****** Create the staff table's twin                          ******
+EXEC SQL: CREATE TABLE NEWSTAFF
+                       (ID        SMALLINT NOT NULL,
+                        NAME      VARCHAR(9),
+                        DEPT      SMALLINT,
+                        JOB       CHAR(5),
+                        YEARS     SMALLINT,
+                        SALARY    DECIMAL(7,2),
+                        COMM      DECIMAL(7,2))
+
+ OK. sql_rcd = 0         Execution time =     2.2800 secs
+
+
+--  ****** Insert two rows into the NEWSTAFF table                ******
+EXEC SQL: INSERT INTO NEWSTAFF
+          VALUES (500, 'Bob', 99, 'Nerds', 5, 45000.00, 0)
+
+ OK. sql_rcd = 0         Execution time =     0.1600 secs
+
+
+EXEC SQL: INSERT INTO NEWSTAFF
+          VALUES (501, 'Dan', 99, 'Nerds', 4, 42000.00, 0)
+
+ OK. sql_rcd = 0         Execution time =     0.0300 secs
+
+
+--  ****** Use a subquery to insert rows from STAFF               ******
+EXEC SQL: INSERT INTO NEWSTAFF
+                 SELECT * FROM STAFF
+                 WHERE  JOB = 'Sales' AND SALARY > 18000
+
+ OK. sql_rcd = 0         Execution time =     0.0300 secs
+
+
+--  ****** COMMIT the work done so far                            ******
+EXEC SQL: COMMIT
+
+ OK. sql_rcd = 0         Execution time =     0.0900 secs
+
+
+--  ****** Let's see what we've got                               ******
+EXEC SQL: SELECT * FROM NEWSTAFF
+          ORDER BY SALARY DESC
+
+ ID      NAME       DEPT    JOB    YEARS   SALARY    COMM                                                                                                                                                                   
+ ------  ---------  ------  -----  ------  --------  --------                                                                                                                                                               
+ 500     Bob        99      Nerds  5       45000.00     00.00                                                                                                                                                               
+ 501     Dan        99      Nerds  4       42000.00     00.00                                                                                                                                                               
+ 310     Graham     66      Sales  13      21000.00    200.30                                                                                                                                                               
+ 150     Williams   51      Sales  6       19456.50    637.65                                                                                                                                                               
+ 280     Wilson     66      Sales  9       18674.50    811.50                                                                                                                                                               
+ 20      Pernal     20      Sales  8       18171.25    612.45                                                                                                                                                               
+ 40      O'Brien    38      Sales  6       18006.00    846.55                                                                                                                                                               
+ 90      Koonitz    42      Sales  6       18001.75   1386.70                                                                                                                                                               
+
+ Total Number of Rows SELECTED = 8
+
+ OK. sql_rcd = 0         Execution time =     0.4200 secs
+
+
+--  ****** Let's give ourselves a good raise                      ******
+EXEC SQL: UPDATE NEWSTAFF
+          SET SALARY = SALARY * 1.80
+          WHERE JOB = 'Nerds'
+
+ OK. sql_rcd = 0         Execution time =     0.0600 secs
+
+
+--  ****** Things look better now                                 ******
+EXEC SQL: SELECT * FROM NEWSTAFF
+          WHERE SALARY + COMM > 21000
+          ORDER BY SALARY DESC
+
+ ID      NAME       DEPT    JOB    YEARS   SALARY    COMM                                                                                                                                                                   
+ ------  ---------  ------  -----  ------  --------  --------                                                                                                                                                               
+ 500     Bob        99      Nerds  5       81000.00     00.00                                                                                                                                                               
+ 501     Dan        99      Nerds  4       75600.00     00.00                                                                                                                                                               
+ 310     Graham     66      Sales  13      21000.00    200.30                                                                                                                                                               
+
+ Total Number of Rows SELECTED = 3
+
+ OK. sql_rcd = 0         Execution time =     0.0300 secs
+
+
+--  ****** Here's how DELETE works                                ******
+EXEC SQL: DELETE FROM NEWSTAFF
+          WHERE JOB = 'Sales'
+
+ OK. sql_rcd = 0         Execution time =     0.0300 secs
+
+
+--  ****** Let's see what happened                                ******
+EXEC SQL: SELECT * FROM NEWSTAFF
+          ORDER BY SALARY DESC
+
+ ID      NAME       DEPT    JOB    YEARS   SALARY    COMM                                                                                                                                                                   
+ ------  ---------  ------  -----  ------  --------  --------                                                                                                                                                               
+ 500     Bob        99      Nerds  5       81000.00     00.00                                                                                                                                                               
+ 501     Dan        99      Nerds  4       75600.00     00.00                                                                                                                                                               
+
+ Total Number of Rows SELECTED = 2
+
+ OK. sql_rcd = 0         Execution time =     0.1100 secs
+
+
+--  *------------------------------------------------------------------*
+--  * SCRIPT 10:  A demonstration of COMMIT/ROLLBACK                   *
+--  *------------------------------------------------------------------*
+
+--  ****** Start a unit of recovery                               ******
+EXEC SQL: COMMIT
+
+ OK. sql_rcd = 0         Execution time =     0.0300 secs
+
+
+--  ****** Let's see what we've got to start                      ******
+EXEC SQL: SELECT * FROM NEWSTAFF
+
+ ID      NAME       DEPT    JOB    YEARS   SALARY    COMM                                                                                                                                                                   
+ ------  ---------  ------  -----  ------  --------  --------                                                                                                                                                               
+ 500     Bob        99      Nerds  5       81000.00     00.00                                                                                                                                                               
+ 501     Dan        99      Nerds  4       75600.00     00.00                                                                                                                                                               
+
+ Total Number of Rows SELECTED = 2
+
+ OK. sql_rcd = 0         Execution time =     0.0600 secs
+
+
+--  ****** Delete all the rows                                    ******
+EXEC SQL: DELETE FROM NEWSTAFF
+
+ OK. sql_rcd = 0         Execution time =     0.0300 secs
+
+
+--  ****** Show the empty table                                   ******
+EXEC SQL: SELECT * FROM NEWSTAFF
+
+ ID      NAME       DEPT    JOB    YEARS   SALARY    COMM                                                                                                                                                                   
+ ------  ---------  ------  -----  ------  --------  --------                                                                                                                                                               
+
+ Total Number of Rows SELECTED = 0
+
+ OK. sql_rcd = 0         Execution time =     0.0300 secs
+
+
+--  ****** Undo the transaction                                   ******
+EXEC SQL: ROLLBACK
+
+ OK. sql_rcd = 0         Execution time =     0.0300 secs
+
+
+--  ****** Show the resurrected rows                              ******
+EXEC SQL: SELECT * FROM NEWSTAFF
+
+ ID      NAME       DEPT    JOB    YEARS   SALARY    COMM                                                                                                                                                                   
+ ------  ---------  ------  -----  ------  --------  --------                                                                                                                                                               
+ 500     Bob        99      Nerds  5       81000.00     00.00                                                                                                                                                               
+ 501     Dan        99      Nerds  4       75600.00     00.00                                                                                                                                                               
+
+ Total Number of Rows SELECTED = 2
+
+ OK. sql_rcd = 0         Execution time =     0.0300 secs
+
+
+--  *------------------------------------------------------------------*
+--  * SCRIPT 11:  Data integrity with NO NULLS                         *
+--  *------------------------------------------------------------------*
+
+--  ****** Here's a way to insert missing values in regular cols  ******
+EXEC SQL: INSERT INTO NEWSTAFF (ID, NAME, DEPT, JOB)
+          VALUES (506, 'Ray', 99, 'Nerds')
+
+ OK. sql_rcd = 0         Execution time =     0.0400 secs
+
+
+--  ****** Here's another way                                     ******
+EXEC SQL: INSERT INTO NEWSTAFF
+          VALUES (507, 'Dan', 99, 'Nerds', NULL, NULL, NULL)
+
+ OK. sql_rcd = 0         Execution time =     0.0000 secs
+
+
+--  ****** Let's see what we've got                               ******
+EXEC SQL: SELECT * FROM NEWSTAFF
+
+ ID      NAME       DEPT    JOB    YEARS   SALARY    COMM                                                                                                                                                                   
+ ------  ---------  ------  -----  ------  --------  --------                                                                                                                                                               
+ 500     Bob        99      Nerds  5       81000.00     00.00                                                                                                                                                               
+ 501     Dan        99      Nerds  4       75600.00     00.00                                                                                                                                                               
+ 506     Ray        99      Nerds  NULL    NULL      NULL                                                                                                                                                                   
+ 507     Dan        99      Nerds  NULL    NULL      NULL                                                                                                                                                                   
+
+ Total Number of Rows SELECTED = 4
+
+ OK. sql_rcd = 0         Execution time =     0.0300 secs
+
+
+--  ****** Watch what happens when inserting into a NOT NULL col  ******
+EXEC SQL: INSERT INTO NEWSTAFF
+          VALUES (NULL, 'Joe', 99, 'Nerds', 1, 30000.00, 0.0)
+
+ ERROR, sql_code = -407
+
+ SQL0407N  Assignment of a null value to a NOT NULL column "ID" was attempted
+ on UPDATE or INSERT. SQLSTATE=23502 
+
+ ------ ADDITIONAL SQLCA Info --------
+ SQLERRMC's:  ID
+ SQLERRP: SQLRSVAL
+ SQLERRD:     -30850         0         0         0         0         0 
+
+
+--  ****** Let's get rid of the garbage data                      ******
+EXEC SQL: ROLLBACK
+
+ OK. sql_rcd = 0         Execution time =     0.0400 secs
+
+
+--  *------------------------------------------------------------------*
+--  * SCRIPT 12:  Data integrity with UNIQUE keys                      *
+--  *------------------------------------------------------------------*
+
+--  ****** Let's try inserting a duplicate record into NEWSTAFF   ******
+EXEC SQL: INSERT INTO NEWSTAFF
+          VALUES (501, 'Dan', 99, 'Nerds', 4, 75600.00, 0)
+
+ OK. sql_rcd = 0         Execution time =     0.0600 secs
+
+
+--  ****** As you can see we're not protected against duplicates  ******
+EXEC SQL: SELECT * FROM NEWSTAFF
+
+ ID      NAME       DEPT    JOB    YEARS   SALARY    COMM                                                                                                                                                                   
+ ------  ---------  ------  -----  ------  --------  --------                                                                                                                                                               
+ 500     Bob        99      Nerds  5       81000.00     00.00                                                                                                                                                               
+ 501     Dan        99      Nerds  4       75600.00     00.00                                                                                                                                                               
+ 501     Dan        99      Nerds  4       75600.00     00.00                                                                                                                                                               
+
+ Total Number of Rows SELECTED = 3
+
+ OK. sql_rcd = 0         Execution time =     0.0600 secs
+
+
+--  ****** Let's get rid of this entry                            ******
+EXEC SQL: ROLLBACK
+
+ OK. sql_rcd = 0         Execution time =     0.0000 secs
+
+
+--  ****** Let's protect ourselves, add a UNIQUE index on ID      ******
+EXEC SQL: CREATE UNIQUE INDEX XID ON NEWSTAFF (ID)
+
+--  ****** Let's see if ENTITY INTEGRITY really works             ******
+EXEC SQL: INSERT INTO NEWSTAFF
+          VALUES (501, 'Dan', 99, 'Nerds', 4, 42000.00, 0)
+
+ ERROR, sql_code = -104
+
+ SQL0104N  An unexpected token "-" was found following "D ON NEWSTAFF (ID)  ".
+ Expected tokens may include:  "END-OF-STATEMENT". SQLSTATE=37501 
+
+ ------ ADDITIONAL SQLCA Info --------
+ SQLERRMC's:  - D ON NEWSTAFF (ID)   END-OF-STATEMENT
+ SQLERRP: SQLRPRSR
+ SQLERRD:     -30850         0         0         0         0         0 
+
+
+--  ****** COMMIT the work done so far                            ******
+EXEC SQL: COMMIT
+
+ OK. sql_rcd = 0         Execution time =     0.0000 secs
+
+
+--  *------------------------------------------------------------------*
+--  * SCRIPT 13:  Data integrity using views with CHECK option         *
+--  *------------------------------------------------------------------*
+
+--  ****** Create a view PROTECT_STAFF with CHECK option          ******
+EXEC SQL: CREATE VIEW PROTECT_STAFF
+          AS SELECT * FROM NEWSTAFF
+          WHERE JOB = 'Nerds' OR JOB = 'Sales'
+          WITH CHECK OPTION
+
+ OK. sql_rcd = 0         Execution time =     0.9400 secs
+
+
+--  ****** Let's see what's in this view so far                   ******
+EXEC SQL: SELECT * FROM PROTECT_STAFF
+
+ ID      NAME       DEPT    JOB    YEARS   SALARY    COMM                                                                                                                                                                   
+ ------  ---------  ------  -----  ------  --------  --------                                                                                                                                                               
+ 500     Bob        99      Nerds  5       81000.00     00.00                                                                                                                                                               
+ 501     Dan        99      Nerds  4       75600.00     00.00                                                                                                                                                               
+
+ Total Number of Rows SELECTED = 2
+
+ OK. sql_rcd = 0         Execution time =     0.0600 secs
+
+
+--  ****** Let's put some more data in PROTECT_STAFF              ******
+EXEC SQL: INSERT INTO PROTECT_STAFF
+          SELECT * FROM STAFF
+          WHERE JOB = 'Sales' and SALARY > 20000
+
+ OK. sql_rcd = 0         Execution time =     0.1600 secs
+
+
+--  ****** Now let's insert another well-paid nerd                ******
+EXEC SQL: INSERT INTO PROTECT_STAFF
+          VALUES (508, 'Joe', 99, 'Nerds', 4, 99000.00, 0.0)
+
+ OK. sql_rcd = 0         Execution time =     0.0300 secs
+
+
+--  ****** Watch what happens when we try to insert a Mgr         ******
+EXEC SQL: INSERT INTO PROTECT_STAFF
+          VALUES (603, 'Sam', 99, 'Mgr', 4, 89000.00, 0.0)
+
+ ERROR, sql_code = -161
+
+ SQL0161N  The resulting row of the INSERT or UPDATE does not conform to the
+ view definition. SQLSTATE=23501 
+
+ ------ ADDITIONAL SQLCA Info --------
+ SQLERRP: SQLRIISS
+ SQLERRD:     -30850         0         0         0         0         0 
+
+
+--  ****** COMMIT the work done so far                            ******
+EXEC SQL: COMMIT
+
+ OK. sql_rcd = 0         Execution time =     0.0600 secs
+
+
+--  *------------------------------------------------------------------*
+--  * SCRIPT 14:  Enforcing Data Integrity with Referential Integrity  *
+--  *------------------------------------------------------------------*
+
+--  ****** Create the ORG table's cousin                          ******
+EXEC SQL: CREATE TABLE NEWORG
+          (DEPTNUMB SMALLINT NOT NULL PRIMARY KEY,
+           DEPTNAME VARCHAR(14),
+           MANAGER  SMALLINT,
+           DIVISION VARCHAR(10),
+           LOCATION VARCHAR(13))
+
+ OK. sql_rcd = 0         Execution time =     1.7500 secs
+
+
+--  ****** Let's put some data into it                            ******
+EXEC SQL: INSERT INTO NEWORG
+          VALUES (99, 'Software', NULL, 'Oceanview', 'Hawaii')
+
+ OK. sql_rcd = 0         Execution time =     0.0400 secs
+
+
+EXEC SQL: INSERT INTO NEWORG
+          VALUES (90, 'Multimedia', NULL, 'Oceanview', 'Tahiti')
+
+ OK. sql_rcd = 0         Execution time =     0.0300 secs
+
+
+--  ****** Let's start with only Nerds in the NEWSTAFF table      ******
+EXEC SQL: DELETE FROM NEWSTAFF
+          WHERE JOB <> 'Nerds'
+
+ OK. sql_rcd = 0         Execution time =     0.0600 secs
+
+
+--  ****** Let's see what we've got so far                        ******
+EXEC SQL: SELECT * FROM NEWORG
+
+ DEPTNUMB  DEPTNAME        MANAGER  DIVISION    LOCATION                                                                                                                                                                    
+ --------  --------------  -------  ----------  -------------                                                                                                                                                               
+ 99        Software        NULL     Oceanview   Hawaii                                                                                                                                                                      
+ 90        Multimedia      NULL     Oceanview   Tahiti                                                                                                                                                                      
+
+ Total Number of Rows SELECTED = 2
+
+ OK. sql_rcd = 0         Execution time =     0.0900 secs
+
+
+EXEC SQL: SELECT * FROM NEWSTAFF
+
+ ID      NAME       DEPT    JOB    YEARS   SALARY    COMM                                                                                                                                                                   
+ ------  ---------  ------  -----  ------  --------  --------                                                                                                                                                               
+ 500     Bob        99      Nerds  5       81000.00     00.00                                                                                                                                                               
+ 501     Dan        99      Nerds  4       75600.00     00.00                                                                                                                                                               
+ 508     Joe        99      Nerds  4       99000.00     00.00                                                                                                                                                               
+
+ Total Number of Rows SELECTED = 3
+
+ OK. sql_rcd = 0         Execution time =     0.0900 secs
+
+
+--  ****** Make DEPT a foreign key to primary key in NEWORG       ******
+EXEC SQL: ALTER TABLE NEWSTAFF
+          FOREIGN KEY KEYNAME1(DEPT) REFERENCES NEWORG
+          ON DELETE RESTRICT
+
+ OK. sql_rcd = 0         Execution time =     0.7200 secs
+
+
+--  ****** Insert data for a valid dept                           ******
+EXEC SQL: INSERT INTO NEWSTAFF
+          VALUES (605, 'Newhire', 99, 'Nerds', 0, 29000.00, 0.0)
+
+ OK. sql_rcd = 0         Execution time =     0.0300 secs
+
+
+EXEC SQL: INSERT INTO NEWSTAFF
+          VALUES (607, 'Newhire', 90, 'Nerds', 0, 29000.00, 0.0)
+
+ OK. sql_rcd = 0         Execution time =     0.0300 secs
+
+
+--  ****** Watch what happens when inserting with an invalid dept ******
+EXEC SQL: INSERT INTO NEWSTAFF
+          VALUES (609, 'Newhire', 20, 'Nerds', 0, 29000.00, 0.0)
+
+ ERROR, sql_code = -530
+
+ SQL0530N  The insert or update value of FOREIGN KEY "KEYNAME1" is not equal to
+ some value of the primary key of the parent table. SQLSTATE=23503 
+
+ ------ ADDITIONAL SQLCA Info --------
+ SQLERRMC's:  KEYNAME1
+ SQLERRP: SQLRIEPC
+ SQLERRD:     -30850         0         0         0         0         0 
+
+
+--  ****** COMMIT the work done so far                            ******
+EXEC SQL: COMMIT
+
+ OK. sql_rcd = 0         Execution time =     0.0600 secs
+
+
+--  *------------------------------------------------------------------*
+--  * SCRIPT 15:  Enforcing Delete Rules with Referential Integrity    *
+--  *------------------------------------------------------------------*
+
+--  ****** Observe how the default DELETE rule protects dependents******
+EXEC SQL: DELETE FROM NEWORG
+          WHERE LOCATION = 'Tahiti'
+
+ ERROR, sql_code = -532
+
+ SQL0532N  A parent row cannot be deleted because the relationship "KEYNAME1"
+ restricts the deletion. SQLSTATE=23504 
+
+ ------ ADDITIONAL SQLCA Info --------
+ SQLERRMC's:  KEYNAME1
+ SQLERRP: SQLRIEDC
+ SQLERRD:     -30850         0         0         0         0         0 
+
+
+--  ****** COMMIT the work done so far                            ******
+EXEC SQL: COMMIT
+
+ OK. sql_rcd = 0         Execution time =     0.0300 secs
+
+
+--  ****** Let's see what data is in our tables                   ******
+EXEC SQL: SELECT * FROM NEWORG
+
+ DEPTNUMB  DEPTNAME        MANAGER  DIVISION    LOCATION                                                                                                                                                                    
+ --------  --------------  -------  ----------  -------------                                                                                                                                                               
+ 99        Software        NULL     Oceanview   Hawaii                                                                                                                                                                      
+ 90        Multimedia      NULL     Oceanview   Tahiti                                                                                                                                                                      
+
+ Total Number of Rows SELECTED = 2
+
+ OK. sql_rcd = 0         Execution time =     0.0900 secs
+
+
+EXEC SQL: SELECT * FROM NEWSTAFF
+
+ ID      NAME       DEPT    JOB    YEARS   SALARY    COMM                                                                                                                                                                   
+ ------  ---------  ------  -----  ------  --------  --------                                                                                                                                                               
+ 500     Bob        99      Nerds  5       81000.00     00.00                                                                                                                                                               
+ 501     Dan        99      Nerds  4       75600.00     00.00                                                                                                                                                               
+ 605     Newhire    99      Nerds  0       29000.00     00.00                                                                                                                                                               
+ 508     Joe        99      Nerds  4       99000.00     00.00                                                                                                                                                               
+ 607     Newhire    90      Nerds  0       29000.00     00.00                                                                                                                                                               
+
+ Total Number of Rows SELECTED = 5
+
+ OK. sql_rcd = 0         Execution time =     0.1200 secs
+
+
+--  ****** DROP the referential constraint                        ******
+EXEC SQL: ALTER TABLE NEWSTAFF
+          DROP FOREIGN KEY KEYNAME1
+
+ OK. sql_rcd = 0         Execution time =     0.1900 secs
+
+
+--  ****** Let's change the referential constraint to SET NULLS   ******
+EXEC SQL: ALTER TABLE NEWSTAFF
+          FOREIGN KEY KEYNAME1(DEPT) REFERENCES NEWORG
+          ON DELETE SET NULL
+
+ OK. sql_rcd = 0         Execution time =     0.1600 secs
+
+
+--  ****** COMMIT the change                                      ******
+EXEC SQL: COMMIT
+
+ OK. sql_rcd = 0         Execution time =     0.0300 secs
+
+
+--  ****** Let's see what REFERENTIAL INTEGRITY does for us now   ******
+EXEC SQL: DELETE FROM NEWORG
+          WHERE LOCATION = 'Tahiti'
+
+ OK. sql_rcd = 0         Execution time =     0.0300 secs
+
+
+--  ****** The Tahiti dept is dropped (this is the parent row)    ******
+EXEC SQL: SELECT * FROM NEWORG
+
+ DEPTNUMB  DEPTNAME        MANAGER  DIVISION    LOCATION                                                                                                                                                                    
+ --------  --------------  -------  ----------  -------------                                                                                                                                                               
+ 99        Software        NULL     Oceanview   Hawaii                                                                                                                                                                      
+
+ Total Number of Rows SELECTED = 1
+
+ OK. sql_rcd = 0         Execution time =     0.0300 secs
+
+
+--  ****** The Tahiti dept in child rows is set to NULL           ******
+EXEC SQL: SELECT * FROM NEWSTAFF
+
+ ID      NAME       DEPT    JOB    YEARS   SALARY    COMM                                                                                                                                                                   
+ ------  ---------  ------  -----  ------  --------  --------                                                                                                                                                               
+ 500     Bob        99      Nerds  5       81000.00     00.00                                                                                                                                                               
+ 501     Dan        99      Nerds  4       75600.00     00.00                                                                                                                                                               
+ 605     Newhire    99      Nerds  0       29000.00     00.00                                                                                                                                                               
+ 508     Joe        99      Nerds  4       99000.00     00.00                                                                                                                                                               
+ 607     Newhire    NULL    Nerds  0       29000.00     00.00                                                                                                                                                               
+
+ Total Number of Rows SELECTED = 5
+
+ OK. sql_rcd = 0         Execution time =     0.0300 secs
+
+
+--  ****** Let's get back our data                                ******
+EXEC SQL: ROLLBACK
+
+ OK. sql_rcd = 0         Execution time =     0.0300 secs
+
+
+--  ****** DROP the referential constraint                        ******
+EXEC SQL: ALTER TABLE NEWSTAFF
+          DROP FOREIGN KEY KEYNAME1
+
+ OK. sql_rcd = 0         Execution time =     0.1000 secs
+
+
+--  ****** Let's change the referential constraint to CASCADE     ******
+EXEC SQL: ALTER TABLE NEWSTAFF
+          FOREIGN KEY KEYNAME1(DEPT) REFERENCES NEWORG
+          ON DELETE CASCADE
+
+ OK. sql_rcd = 0         Execution time =     0.0900 secs
+
+
+--  ****** COMMIT the change                                      ******
+EXEC SQL: COMMIT
+
+ OK. sql_rcd = 0         Execution time =     0.0600 secs
+
+
+--  ****** Let's see what REFERENTIAL INTEGRITY does for us now   ******
+EXEC SQL: DELETE FROM NEWORG
+          WHERE LOCATION = 'Hawaii'
+
+ OK. sql_rcd = 0         Execution time =     0.0400 secs
+
+
+--  ****** The parent dept for Hawaii is gone                     ******
+EXEC SQL: SELECT * FROM NEWORG
+
+ DEPTNUMB  DEPTNAME        MANAGER  DIVISION    LOCATION                                                                                                                                                                    
+ --------  --------------  -------  ----------  -------------                                                                                                                                                               
+ 90        Multimedia      NULL     Oceanview   Tahiti                                                                                                                                                                      
+
+ Total Number of Rows SELECTED = 1
+
+ OK. sql_rcd = 0         Execution time =     0.0300 secs
+
+
+--  ****** All the Hawaii employees (the child rows) are also gone******
+EXEC SQL: SELECT * FROM NEWSTAFF
+
+ ID      NAME       DEPT    JOB    YEARS   SALARY    COMM                                                                                                                                                                   
+ ------  ---------  ------  -----  ------  --------  --------                                                                                                                                                               
+ 607     Newhire    90      Nerds  0       29000.00     00.00                                                                                                                                                               
+
+ Total Number of Rows SELECTED = 1
+
+ OK. sql_rcd = 0         Execution time =     0.0300 secs
+
+
+--  ****** Let's get back our data, we made the point             ******
+EXEC SQL: ROLLBACK
+
+ OK. sql_rcd = 0         Execution time =     0.0000 secs
+
+
+--  *------------------------------------------------------------------*
+--  * SCRIPT 16:  Cascaded Delete rules with Referential Integrity     *
+--  *------------------------------------------------------------------*
+
+--  ****** Specify the PRIMARY key for NEWSTAFF                   ******
+EXEC SQL: ALTER TABLE NEWSTAFF PRIMARY KEY (ID)
+
+ OK. sql_rcd = 0         Execution time =     0.9700 secs
+
+
+--  ****** Create the SPOUSES table                               ******
+EXEC SQL: CREATE TABLE SPOUSES
+          (SPOUSE_NAME VARCHAR(20),
+           TELEPHONE   VARCHAR(10),
+           EMPL_ID     SMALLINT,
+           FOREIGN KEY HOMENUM(EMPL_ID) REFERENCES NEWSTAFF
+           ON DELETE CASCADE)
+
+ OK. sql_rcd = 0         Execution time =     0.7200 secs
+
+
+--  ****** Insert some data into spouses                          ******
+EXEC SQL: INSERT INTO SPOUSES
+          VALUES ('Michiko', '4152223333', 501)
+
+ OK. sql_rcd = 0         Execution time =     0.0900 secs
+
+
+EXEC SQL: INSERT INTO SPOUSES
+          VALUES ('Jeri', '4154445555', 500)
+
+ OK. sql_rcd = 0         Execution time =     0.0300 secs
+
+
+--  ****** Let's take stock of what we've got                     ******
+EXEC SQL: SELECT * FROM NEWORG
+
+ DEPTNUMB  DEPTNAME        MANAGER  DIVISION    LOCATION                                                                                                                                                                    
+ --------  --------------  -------  ----------  -------------                                                                                                                                                               
+ 99        Software        NULL     Oceanview   Hawaii                                                                                                                                                                      
+ 90        Multimedia      NULL     Oceanview   Tahiti                                                                                                                                                                      
+
+ Total Number of Rows SELECTED = 2
+
+ OK. sql_rcd = 0         Execution time =     0.1900 secs
+
+
+EXEC SQL: SELECT * FROM NEWSTAFF
+
+ ID      NAME       DEPT    JOB    YEARS   SALARY    COMM                                                                                                                                                                   
+ ------  ---------  ------  -----  ------  --------  --------                                                                                                                                                               
+ 500     Bob        99      Nerds  5       81000.00     00.00                                                                                                                                                               
+ 501     Dan        99      Nerds  4       75600.00     00.00                                                                                                                                                               
+ 605     Newhire    99      Nerds  0       29000.00     00.00                                                                                                                                                               
+ 508     Joe        99      Nerds  4       99000.00     00.00                                                                                                                                                               
+ 607     Newhire    90      Nerds  0       29000.00     00.00                                                                                                                                                               
+
+ Total Number of Rows SELECTED = 5
+
+ OK. sql_rcd = 0         Execution time =     0.0900 secs
+
+
+EXEC SQL: SELECT * FROM SPOUSES
+
+ SPOUSE_NAME           TELEPHONE   EMPL_ID                                                                                                                                                                                  
+ --------------------  ----------  -------                                                                                                                                                                                  
+ Michiko               4152223333  501                                                                                                                                                                                      
+ Jeri                  4154445555  500                                                                                                                                                                                      
+
+ Total Number of Rows SELECTED = 2
+
+ OK. sql_rcd = 0         Execution time =     0.0300 secs
+
+
+--  ****** Watch this cruel & unusual punishment: No more Hawaii  ******
+EXEC SQL: DELETE FROM NEWORG
+          WHERE  LOCATION = 'Hawaii'
+
+ OK. sql_rcd = 0         Execution time =     0.1300 secs
+
+
+--  ****** Let's see the the damage this has created              ******
+EXEC SQL: SELECT * FROM NEWORG
+
+ DEPTNUMB  DEPTNAME        MANAGER  DIVISION    LOCATION                                                                                                                                                                    
+ --------  --------------  -------  ----------  -------------                                                                                                                                                               
+ 90        Multimedia      NULL     Oceanview   Tahiti                                                                                                                                                                      
+
+ Total Number of Rows SELECTED = 1
+
+ OK. sql_rcd = 0         Execution time =     0.0600 secs
+
+
+EXEC SQL: SELECT * FROM NEWSTAFF
+
+ ID      NAME       DEPT    JOB    YEARS   SALARY    COMM                                                                                                                                                                   
+ ------  ---------  ------  -----  ------  --------  --------                                                                                                                                                               
+ 607     Newhire    90      Nerds  0       29000.00     00.00                                                                                                                                                               
+
+ Total Number of Rows SELECTED = 1
+
+ OK. sql_rcd = 0         Execution time =     0.0300 secs
+
+
+EXEC SQL: SELECT * FROM SPOUSES
+
+ SPOUSE_NAME           TELEPHONE   EMPL_ID                                                                                                                                                                                  
+ --------------------  ----------  -------                                                                                                                                                                                  
+
+ Total Number of Rows SELECTED = 0
+
+ OK. sql_rcd = 0         Execution time =     0.0600 secs
+
+
+--  ****** Let's bring back our data, we made the point           ******
+EXEC SQL: ROLLBACK
+
+ OK. sql_rcd = 0         Execution time =     0.3500 secs
+
+
